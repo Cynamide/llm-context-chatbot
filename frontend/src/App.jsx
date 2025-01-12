@@ -7,7 +7,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const [response, setResponse] = useState(""); // Last prompt and response
 
-  const baseUrl = "http://127.0.0.1:8000";
+  const baseUrl = process.env.BACKEND_URL;
   const url = `${baseUrl}/create-knowledge-base`;
 
   // Handle sending messages
