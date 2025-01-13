@@ -22,7 +22,6 @@ import os
 # Initialize FastAPI app
 app = FastAPI()
 
-
 origins = [
     "https://llm-chatbot.netlify.app",  # Adjust according to your frontend's URL
     "https://llm-chatbot.netlify.app:5173",
