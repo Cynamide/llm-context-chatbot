@@ -47,7 +47,7 @@ function App() {
   return (
     <>
       <h1 className="font-bold w-full p-6 text-center text-3xl">
-        Crustdata Chatbot
+        Chatbot app with context
       </h1>
 
       <div className="flex flex-col items-center">
