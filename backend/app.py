@@ -2,11 +2,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-import pdb
+import dotenv
 
-from dotenv import load_dotenv
-
-load_dotenv()  # Load environment variables from .env file
+dotenv.load_dotenv()  # Load environment variables from .env file
 
 
 from langchain_community.document_loaders import WebBaseLoader
@@ -19,14 +17,6 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain.schema import Document
 
-
-from notion_client import Client
-
-
-
-
-import re
-
 import os
 
 # Initialize FastAPI app
@@ -34,8 +24,10 @@ app = FastAPI()
 
 
 origins = [
-    "http://localhost:5173",  # Adjust according to your frontend's URL
-    "http://127.0.0.1:5173",
+    "https://llm-chatbot.netlify.app",  # Adjust according to your frontend's URL
+    "https://llm-chatbot.netlify.app:5173",
+    os.environ.get("FRONTEND_URL")
+    
     # Add other allowed origins as needed
 ]
 
