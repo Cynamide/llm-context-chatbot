@@ -7,8 +7,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const [response, setResponse] = useState(""); // Last prompt and response
 
-  const baseUrl = import.meta.env.BACKEND_URL;
-  const url = `${baseUrl}/create-knowledge-base`;
+  const baseUrl = process.env.BACKEND_URL;
 
   // Handle sending messages
   const handleSendMessage = async () => {
