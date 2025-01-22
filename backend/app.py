@@ -44,6 +44,8 @@ app.add_middleware(
 vector_store = None
 qa_chain = None
 
+stored_files = set()  # Set to track stored files
+
 # Define request models
 class KnowledgeBaseRequest(BaseModel):
     knowledge: str
@@ -51,7 +53,7 @@ class KnowledgeBaseRequest(BaseModel):
 class QueryRequest(BaseModel):
     query: str
 
-@app.post("/create-knowledge-base")
+@app.post("/upload-file")
 async def create_knowledge_base(request:KnowledgeBaseRequest):
     """
     Endpoint to create a knowledge base from provided knowledge.
@@ -99,6 +101,53 @@ async def query_knowledge_base(request: QueryRequest):
 
     try:
         # Generate an answer using the QA chain
+        prompt = """Sample questions and answers
+                    Q: “How do I search for people given their current title, current company and location?”
+                    Sample answer: 
+                    You can use api.crustdata.com/screener/person/search endpoint. Here is an example curl request to find “people with title engineer at OpenAI in San Francisco”
+                    curl --location 'https://api.crustdata.com/screener/person/search' \
+                    --header 'Content-Type: application/json' \
+                    --header 'Authorization: Token $token \
+                    --data '{
+                        "filters": [
+                            {
+                                "filter_type": "CURRENT_COMPANY",
+                                "type": "in",
+                                "value": [
+                                    "openai.com"
+                                ]
+                            },
+                            {
+                                "filter_type": "CURRENT_TITLE",
+                                "type": "in",
+                                "value": [
+                                    "engineer"
+                                ]
+                            },
+                            {    "filter_type": "REGION",
+                                "type": "in",
+                                "value": [
+                                    "San Francisco, California, United States"
+                                ]
+                            }        
+                        ],
+                        "page": 1
+                    }'
+
+                    Q: I tried using the screener/person/search API to compare against previous values this weekend. I am blocked on the filter values. It seems like there's a strict set of values for something like a region. Because of that if I pass in something that doesn't fully conform to the list of enums you support for that filter value, the API call fails. The location fields for us are not normalized so I can't make the calls.
+                    I tried search/enrichment by email but for many entities we have @gmails rather than business emails. Results are not the best.
+
+
+                    Is there a standard you're using for the region values? I get this wall of text back when I don't submit a proper region value but it's hard for me to know at a glance how I should format my input
+                    {
+                    "non_field_errors": [
+                        "No mapping found for REGION: San Francisco. Correct values are ['Aruba', 'Afghanistan', 'Angola', 'Anguilla', 'Åland Islands', 'Albania', 'Andorra', 'United States', 'United Kingdom', 'United Arab Emirates', 'United States Minor Outlying Islands', 'Argentina', 'Armenia', 'American Samoa', 'US Virgin Islands', 'Antarctica', 'French Polynesia', 'French Guiana', 'French Southern and Antarctic Lands', 'Antigua and Barbuda', 'Australia', 'Austria', 'Azerbaijan', 'Burundi', 'Belgium', 'Benin', 'Burkina Faso', 'Bangladesh', 'Bulgaria', 'Bahrain', 'The Bahamas', 'Bosnia and Herzegovina', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Saint Kitts and Nevis', 'Saint Helena, Ascension and Tristan da
+                    …
+                            
+
+                    Sample answer
+                    Yes there is specific list of regions listed here https://crustdata-docs-region-json.s3.us-east-2.amazonaws.com/updated_regions.json .
+                    """
         response = qa_chain.invoke(request.query)
         return {"query": request.query, "answer": response}
 
