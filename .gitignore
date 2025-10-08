@@ -1,5 +1,3 @@
 # Local Netlify folder
-.netlify
-/backend/venv
-/backend/.env
 /frontend/.env
+/backend-worker/.wrangler
