@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS Context (
+    id INTEGER PRIMARY KEY,
+    file_name TEXT NOT NULL,
+    text TEXT NOT NULL
+);
