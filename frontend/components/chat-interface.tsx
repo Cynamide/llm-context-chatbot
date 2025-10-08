@@ -99,7 +99,7 @@ export function ChatInterface() {
         <p className="text-sm text-muted-foreground">Ask questions about your knowledge base</p>
       </header>
 
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-4 overflow-auto" ref={scrollRef}>
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center space-y-4">

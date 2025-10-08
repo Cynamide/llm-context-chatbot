@@ -4,7 +4,7 @@ const WORKER_URL = process.env.WORKER_URL
 
 export async function POST(req: Request) {
   if (!WORKER_URL) {
-    console.error("[v0] WORKER_URL or BACKEND environment variable is not set")
+    console.error(" WORKER_URL or BACKEND environment variable is not set")
     return new Response(
       JSON.stringify({ error: "Worker URL not configured. Please set BACKEND or WORKER_URL environment variable." }),
       {
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       })
     }
 
-    console.log("[v0] Sending query to:", `${WORKER_URL}api/query`)
+    console.log(" Sending query to:", `${WORKER_URL}api/query`)
 
     // Forward the request to your Cloudflare Worker
     const response = await fetch(`${WORKER_URL}api/query`, {
@@ -33,11 +33,11 @@ export async function POST(req: Request) {
       body: JSON.stringify({ query, top_k: 5 }),
     })
 
-    console.log("[v0] Query response status:", response.status)
+    console.log(" Query response status:", response.status)
 
     if (!response.ok) {
       const text = await response.text()
-      console.error("[v0] Query failed with response:", text.substring(0, 200))
+      console.error(" Query failed with response:", text.substring(0, 200))
       throw new Error(`Worker request failed: ${response.statusText}`)
     }
 
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       },
     })
   } catch (error) {
-    console.error("[v0] Chat API error:", error)
+    console.error(" Chat API error:", error)
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Internal server error",
