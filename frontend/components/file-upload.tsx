@@ -12,34 +12,6 @@ import { uploadKnowledge } from "@/app/actions"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Upload, FileText, PenSquare } from "lucide-react"
 
-async function extractTextFromPDF(file: File): Promise<string> {
-  try {
-    // Dynamically import pdfjs-dist to avoid SSR issues
-    const pdfjsLib = await import("pdfjs-dist")
-
-    // Set worker source
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
-
-    const arrayBuffer = await file.arrayBuffer()
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
-
-    let fullText = ""
-
-    // Extract text from each page
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i)
-      const textContent = await page.getTextContent()
-      const pageText = textContent.items.map((item: any) => item.str).join(" ")
-      fullText += pageText + "\n\n"
-    }
-
-    return fullText.trim()
-  } catch (error) {
-    console.error("[v0] PDF extraction error:", error)
-    throw new Error("Failed to extract text from PDF")
-  }
-}
-
 export function FileUpload() {
   const [showCustomModal, setShowCustomModal] = useState(false)
   const [fileName, setFileName] = useState("")
@@ -62,7 +34,9 @@ export function FileUpload() {
           title: "Processing PDF",
           description: "Extracting text from PDF file...",
         })
-        text = await extractTextFromPDF(file)
+        console.log("PDF upload not implemented yet")
+        // throw error to indicate PDF handling is not implemented
+        throw new Error("PDF upload not implemented yet")
       } else {
         text = await file.text()
       }
@@ -157,7 +131,7 @@ export function FileUpload() {
                 {isUploading ? "Uploading..." : "Upload a File"}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Upload .txt, .md, .json, .csv, or .pdf files to add to your knowledge base
+                Upload .txt, .md, .json, .csv files to add to your knowledge base. <br /><p className="text-red-400"> PDFs coming soon! </p>
               </p>
             </div>
           </div>
