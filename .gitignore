@@ -1,3 +1,4 @@
 # Local Netlify folder
 /frontend/.env
 /backend-worker/.wrangler
+/backend-worker/node_modules
