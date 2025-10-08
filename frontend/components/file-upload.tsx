@@ -131,7 +131,7 @@ export function FileUpload() {
                 {isUploading ? "Uploading..." : "Upload a File"}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Upload .txt, .md, .json, .csv files to add to your knowledge base. <br/> PDFs coming soon! 
+                Upload .txt, .md, .json, .csv files to add to your knowledge base. <br /> PDFs coming soon!
               </p>
             </div>
           </div>

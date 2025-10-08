@@ -5,9 +5,8 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'RAG Chatbot',
+  description: 'A chatbot that can answer questions based on your own documents.',
 }
 
 export default function RootLayout({
