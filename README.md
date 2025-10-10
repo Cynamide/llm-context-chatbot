@@ -3,9 +3,9 @@
 <!-- HEADER STYLE: CLASSIC -->
 <div align="center">
 
-<img src="readmeai/assets/logos/purple.svg" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
+<img src="https://github.com/user-attachments/assets/6c082200-c62a-49d0-bb74-701e6cb14323" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
 
-# LLM-CONTEXT-CHATBOT
+# RAGFLOW
 
 <em></em>
 
@@ -16,7 +16,6 @@
 <img src="https://img.shields.io/github/languages/count/Cynamide/llm-context-chatbot?style=default&color=0080ff" alt="repo-language-count">
 
 <!-- default option, no dependency badges. -->
-
 
 <!-- default option, no dependency badges. -->
 
@@ -54,9 +53,8 @@
 | 📄 | **Documentation** | <ul><li>Includes Docker setup instructions in the frontend directory's .env file.</li><li>Package.json files in frontend and backend-worker folders provide package details.</li></ul> |
 | 🔌 | **Integrations**  | <ul><li>Integrates various Radix UI components for enhanced user interface interactions.</li><li>Utilizes Tailwind CSS for styling and responsive design.</li></ul> |
 | 🧩 | **Modularity**    | <ul><li>Components are organized into separate folders for better code organization and reusability.</li><li>Uses Next.js for frontend routing and component-based development.</li></ul> |
-| 🧪 | **Testing**       | <ul><li>Includes Vitest for testing components and ensuring UI functionality.</li><li>Uses React Testing Library for unit testing React components.</li></ul> |
-| ⚡️  | **Performance**   | <ul><li>Employs Embla Carousel React for smooth and performant carousel interactions.</li><li>Optimizes bundle size and loading speed through Next.js optimization features.</li></ul> |
-| 🛡️ | **Security**      | <ul><li>Utilizes Cloudflare Workers for secure serverless execution of backend logic.</li><li>Follows best practices for data handling and authentication to ensure security.</li></ul> |
+| ⚡️  | **Performance**   | <ul><li>Employs Cloudflare Workers and D1 for availability, high performance and auto scaling.</li><li>Optimizes bundle size and loading speed through Next.js optimization features.</li></ul> |
+| 🛡️ | **Security**      | <ul><li>Utilizes Cloudflare Workers for secure serverless execution of backend logic.</li><li>Follows best practices for data handling to ensure security.</li></ul> |
 | 📦 | **Dependencies**  | <ul><li>Includes a wide range of dependencies for UI components, state management, styling, and testing.</li><li>Uses package-lock.json files to lock dependency versions for consistency.</li></ul> |
 
 ---
