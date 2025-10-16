@@ -752,22 +752,7 @@
 ---
 
 
-
-## Roadmap
-
-- [X] **`Task 1`**: <strike>Implement feature one.</strike>
-- [ ] **`Task 2`**: Implement feature two.
-- [ ] **`Task 3`**: Implement feature three.
-
----
-
 ## Contributing
-
-- **💬 [Join the Discussions](https://github.com/Cynamide/llm-context-chatbot/discussions)**: Share your insights, provide feedback, or ask questions.
-- **🐛 [Report Issues](https://github.com/Cynamide/llm-context-chatbot/issues)**: Submit bugs found or log feature requests for the `llm-context-chatbot` project.
-- **💡 [Submit Pull Requests](https://github.com/Cynamide/llm-context-chatbot/blob/main/CONTRIBUTING.md)**: Review open PRs, and submit your own PRs.
-
-<details closed>
 <summary>Contributing Guidelines</summary>
 
 1. **Fork the Repository**: Start by forking the project repository to your github account.
@@ -806,22 +791,6 @@
 
 ## License
 
-Llm-context-chatbot is protected under the [LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
-
----
-
-## Acknowledgments
-
-- Credit `contributors`, `inspiration`, `references`, etc.
-
-<div align="right">
-
-[![][back-to-top]](#top)
-
-</div>
-
-
-[back-to-top]: https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square
-
+Llm-context-chatbot is protected under the [MIT](/LICENSE) License. For more details, refer to the [LICENSE](/LICENSE) file.
 
 ---
