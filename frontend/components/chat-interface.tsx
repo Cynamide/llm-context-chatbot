@@ -51,13 +51,11 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
+    bottomRef.current?.scrollIntoView({ block: "end" })
   }, [messages])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,7 +145,7 @@ export function ChatInterface() {
         <p className="text-sm text-muted-foreground">Ask questions about your knowledge base</p>
       </header>
 
-      <ScrollArea className="flex-1 p-4 overflow-auto" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-4 overflow-auto">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center space-y-4">
@@ -219,6 +217,7 @@ export function ChatInterface() {
                 )}
               </div>
             ))}
+            <div ref={bottomRef} />
           </div>
         )}
       </ScrollArea>
