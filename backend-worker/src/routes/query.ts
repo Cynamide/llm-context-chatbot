@@ -27,6 +27,7 @@ router.post("/", async (c) => {
     const stream = await c.env.AI.run("@cf/meta/llama-3.1-8b-instruct-fast", {
         messages,
         stream: true,
+        max_tokens: 4096,
     });
 
     return new Response(stream, {
