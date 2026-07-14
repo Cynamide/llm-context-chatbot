@@ -34,7 +34,6 @@ export function KnowledgeList({ refreshToken }: KnowledgeListProps) {
       const result = await getKnowledgeFiles()
       if (result.success && result.files) {
         setFiles(result.files)
-        return result.files
       }
     } catch (error) {
       toast({
@@ -45,8 +44,6 @@ export function KnowledgeList({ refreshToken }: KnowledgeListProps) {
     } finally {
       setIsLoading(false)
     }
-
-    return []
   }
 
   useEffect(() => {
@@ -72,15 +69,11 @@ export function KnowledgeList({ refreshToken }: KnowledgeListProps) {
     try {
       const result = await deleteKnowledgeFile(fileName)
       if (result.success) {
-        const refreshedFiles = await loadFiles()
-        const stillPresent = refreshedFiles.some((file) => file.file_name === fileName)
-        if (stillPresent) {
-          throw new Error("File still exists after delete. Please try again.")
-        }
         toast({
           title: "Success",
           description: result.message,
         })
+        setFiles((currentFiles) => currentFiles.filter((file) => file.file_name !== fileName))
       } else {
         throw new Error(result.error)
       }
