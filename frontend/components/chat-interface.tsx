@@ -7,10 +7,18 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Send, Loader2, Bot, User } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import {
+  appendAssistantPlaceholder,
+  appendAssistantText,
+  completeAssistantMessage,
+  replaceAssistantMessage,
+} from "@/lib/chat-stream"
 
 interface Message {
   role: "user" | "assistant"
   content: string
+  status?: "streaming" | "done"
 }
 
 export function ChatInterface() {
@@ -18,6 +26,7 @@ export function ChatInterface() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -30,7 +39,7 @@ export function ChatInterface() {
     if (!input.trim() || isLoading) return
 
     const userMessage: Message = { role: "user", content: input }
-    setMessages((prev) => [...prev, userMessage])
+    setMessages((prev) => appendAssistantPlaceholder([...prev, userMessage]))
     setInput("")
     setIsLoading(true)
 
@@ -45,48 +54,60 @@ export function ChatInterface() {
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
-      let assistantMessage = ""
+      let buffer = ""
 
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }])
+      const processEvent = (event: string) => {
+        const lines = event.split("\n")
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue
+
+          const data = line.slice(6)
+          if (data === "[DONE]") {
+            continue
+          }
+
+          try {
+            const parsed = JSON.parse(data)
+            if (parsed.response) {
+              setMessages((prev) => appendAssistantText(prev, parsed.response))
+            }
+          } catch {
+            // Skip malformed chunks and keep streaming.
+          }
+        }
+      }
 
       if (reader) {
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
 
-          const chunk = decoder.decode(value)
-          const lines = chunk.split("\n")
+          buffer += decoder.decode(value, { stream: true })
 
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6)
-              if (data === "[DONE]") continue
+          const events = buffer.split("\n\n")
+          buffer = events.pop() ?? ""
 
-              try {
-                const parsed = JSON.parse(data)
-                if (parsed.response) {
-                  assistantMessage += parsed.response
-                  setMessages((prev) => {
-                    const newMessages = [...prev]
-                    newMessages[newMessages.length - 1].content = assistantMessage
-                    return newMessages
-                  })
-                }
-              } catch (e) {
-                // Skip invalid JSON
-              }
-            }
+          for (const event of events) {
+            processEvent(event)
           }
         }
       }
+
+      if (buffer.trim()) {
+        processEvent(buffer)
+      }
+
+      setMessages((prev) => completeAssistantMessage(prev))
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, I encountered an error. Please try again.",
-        },
-      ])
+      setMessages((prev) =>
+        replaceAssistantMessage(prev, "Sorry, I encountered an error. Please try again.", "done"),
+      )
+      toast({
+        title: "Chat failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -126,7 +147,22 @@ export function ChatInterface() {
                       : "bg-card text-card-foreground border border-border"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  {message.role === "assistant" && message.status === "streaming" && message.content.length === 0 ? (
+                    <div className="flex items-center gap-1 py-1" aria-label="Assistant is typing">
+                      <span className="sr-only">Assistant is typing</span>
+                      {["0", "1", "2", "3"].map((dot, index) => (
+                        <span
+                          key={dot}
+                          className="inline-block text-base leading-none animate-pulse"
+                          style={{ animationDelay: `${index * 140}ms` }}
+                        >
+                          .
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  )}
                 </div>
                 {message.role === "user" && (
                   <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">

@@ -1,24 +1,31 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { getKnowledgeFiles, deleteKnowledgeFile, getFileContent } from "@/app/actions"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Trash2, FileText, RefreshCw, Eye } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { shouldRefreshKnowledgeFiles } from "@/lib/knowledge-refresh"
 
 interface KnowledgeFile {
   file_name: string
 }
 
-export function KnowledgeList() {
+interface KnowledgeListProps {
+  refreshToken: number
+}
+
+export function KnowledgeList({ refreshToken }: KnowledgeListProps) {
   const [files, setFiles] = useState<KnowledgeFile[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [deletingFile, setDeletingFile] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
   const [fileContent, setFileContent] = useState<string>("")
   const [isLoadingContent, setIsLoadingContent] = useState(false)
+  const previousIsVisibleRef = useRef(false)
+  const lastLoadedTokenRef = useRef<number | null>(null)
   const { toast } = useToast()
 
   const loadFiles = async () => {
@@ -40,8 +47,22 @@ export function KnowledgeList() {
   }
 
   useEffect(() => {
+    const isVisible = true
+
+    if (!shouldRefreshKnowledgeFiles({
+      isVisible,
+      previousIsVisible: previousIsVisibleRef.current,
+      refreshToken,
+      lastLoadedToken: lastLoadedTokenRef.current,
+    })) {
+      previousIsVisibleRef.current = isVisible
+      return
+    }
+
+    previousIsVisibleRef.current = isVisible
+    lastLoadedTokenRef.current = refreshToken
     loadFiles()
-  }, [])
+  }, [refreshToken])
 
   const handleDelete = async (fileName: string) => {
     setDeletingFile(fileName)

@@ -11,8 +11,13 @@ import { Label } from "@/components/ui/label"
 import { uploadKnowledge } from "@/app/actions"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Upload, FileText, PenSquare } from "lucide-react"
+import { extractPdfTextFromBytes } from "@/lib/pdf-text"
 
-export function FileUpload() {
+interface FileUploadProps {
+  onUploadSuccess?: () => void
+}
+
+export function FileUpload({ onUploadSuccess }: FileUploadProps) {
   const [showCustomModal, setShowCustomModal] = useState(false)
   const [fileName, setFileName] = useState("")
   const [content, setContent] = useState("")
@@ -26,27 +31,35 @@ export function FileUpload() {
 
     setIsUploading(true)
     try {
-      let text: string
+      let text = ""
 
-      // Check if file is PDF
       if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
         toast({
           title: "Processing PDF",
-          description: "Extracting text from PDF file...",
+          description: `Extracting text from ${file.name}...`,
         })
-        console.log("PDF upload not implemented yet")
-        // throw error to indicate PDF handling is not implemented
-        throw new Error("PDF upload not implemented yet")
+        const bytes = new Uint8Array(await file.arrayBuffer())
+        text = await extractPdfTextFromBytes(bytes)
+
+        if (!text.trim()) {
+          throw new Error("This PDF does not contain extractable text.")
+        }
       } else {
         text = await file.text()
       }
+
+      toast({
+        title: "Uploading",
+        description: `Sending ${file.name} to the knowledge base...`,
+      })
 
       const result = await uploadKnowledge([{ file_name: file.name, text }])
       if (result.success) {
         toast({
           title: "Success",
-          description: `${file.name} uploaded successfully`,
+          description: result.message || `${file.name} uploaded successfully`,
         })
+        onUploadSuccess?.()
         if (fileInputRef.current) {
           fileInputRef.current.value = ""
         }
@@ -83,6 +96,7 @@ export function FileUpload() {
           title: "Success",
           description: result.message,
         })
+        onUploadSuccess?.()
         setFileName("")
         setContent("")
         setShowCustomModal(false)
@@ -131,7 +145,7 @@ export function FileUpload() {
                 {isUploading ? "Uploading..." : "Upload a File"}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Upload .txt, .md, .json, .csv files to add to your knowledge base. <br /> PDFs coming soon!
+                Upload .txt, .md, .json, .csv, and text-based .pdf files to add to your knowledge base.
               </p>
             </div>
           </div>

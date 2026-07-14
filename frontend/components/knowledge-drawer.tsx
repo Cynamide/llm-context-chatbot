@@ -10,6 +10,7 @@ import { Upload, Database, ChevronLeft, ChevronRight } from "lucide-react"
 export function KnowledgeDrawer() {
   const [isOpen, setIsOpen] = useState(true)
   const [activeTab, setActiveTab] = useState<"upload" | "knowledge">("upload")
+  const [knowledgeRefreshToken, setKnowledgeRefreshToken] = useState(0)
 
   return (
     <>
@@ -48,7 +49,13 @@ export function KnowledgeDrawer() {
         </div>
 
         <ScrollArea className="flex-1">
-          <div className="p-4">{activeTab === "upload" ? <FileUpload /> : <KnowledgeList />}</div>
+          <div className="p-4">
+            {activeTab === "upload" ? (
+              <FileUpload onUploadSuccess={() => setKnowledgeRefreshToken((value) => value + 1)} />
+            ) : (
+              <KnowledgeList refreshToken={knowledgeRefreshToken} />
+            )}
+          </div>
         </ScrollArea>
       </aside>
 
