@@ -19,6 +19,31 @@ interface Message {
   role: "user" | "assistant"
   content: string
   status?: "streaming" | "done"
+  metrics?: {
+    startedAt?: number
+    firstTokenAt?: number
+    completedAt?: number
+    ttftMs?: number
+    totalMs?: number
+    estimatedTokens?: number
+    tokensPerSecond?: number
+  }
+}
+
+function formatDuration(ms?: number) {
+  if (ms == null) return null
+
+  if (ms < 1000) {
+    return `${Math.round(ms)}ms`
+  }
+
+  const seconds = ms / 1000
+  return `${seconds >= 10 ? seconds.toFixed(1) : seconds.toFixed(2)}s`
+}
+
+function formatTokensPerSecond(value?: number) {
+  if (value == null || Number.isNaN(value)) return null
+  return `${value.toFixed(value >= 10 ? 0 : 1)} tok/s`
 }
 
 export function ChatInterface() {
@@ -38,8 +63,9 @@ export function ChatInterface() {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
+    const startedAt = performance.now()
     const userMessage: Message = { role: "user", content: input }
-    setMessages((prev) => appendAssistantPlaceholder([...prev, userMessage]))
+    setMessages((prev) => appendAssistantPlaceholder([...prev, userMessage], startedAt))
     setInput("")
     setIsLoading(true)
 
@@ -70,7 +96,7 @@ export function ChatInterface() {
           try {
             const parsed = JSON.parse(data)
             if (parsed.response) {
-              setMessages((prev) => appendAssistantText(prev, parsed.response))
+              setMessages((prev) => appendAssistantText(prev, parsed.response, performance.now()))
             }
           } catch {
             // Skip malformed chunks and keep streaming.
@@ -98,7 +124,7 @@ export function ChatInterface() {
         processEvent(buffer)
       }
 
-      setMessages((prev) => completeAssistantMessage(prev))
+      setMessages((prev) => completeAssistantMessage(prev, performance.now()))
     } catch (error) {
       setMessages((prev) =>
         replaceAssistantMessage(prev, "Sorry, I encountered an error. Please try again.", "done"),
@@ -161,7 +187,28 @@ export function ChatInterface() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    <>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      {message.role === "assistant" && message.metrics ? (
+                        <div className="mt-2 flex flex-wrap gap-2 border-t border-border/60 pt-2 text-[11px] leading-none text-muted-foreground/80">
+                          {message.metrics.ttftMs != null ? (
+                            <span className="rounded-full bg-muted/60 px-2 py-1">
+                              TTFT {formatDuration(message.metrics.ttftMs)}
+                            </span>
+                          ) : null}
+                          {message.metrics.tokensPerSecond != null ? (
+                            <span className="rounded-full bg-muted/60 px-2 py-1">
+                              {formatTokensPerSecond(message.metrics.tokensPerSecond)}
+                            </span>
+                          ) : null}
+                          {message.metrics.totalMs != null ? (
+                            <span className="rounded-full bg-muted/60 px-2 py-1">
+                              Total {formatDuration(message.metrics.totalMs)}
+                            </span>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </>
                   )}
                 </div>
                 {message.role === "user" && (
