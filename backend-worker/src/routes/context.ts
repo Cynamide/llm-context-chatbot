@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { runUpload } from "../utils/uploadFiles";
 import { joinContentRows, sortRowsByIdOrder } from "../utils/fileContent";
+import { deleteContextFile } from "../utils/deleteContextFile";
 const context = new Hono<{ Bindings: Env }>();
 
 /**
@@ -88,22 +89,8 @@ context.get("/file/:file_name", async (c) => {
 context.delete("/file/:file_name", async (c) => {
     const fileName = c.req.param("file_name");
     if (!fileName) return new Response("Missing file name", { status: 400 });
-    const fileIds = await c.env.KV.get(fileName);
-    let ids = fileIds ? JSON.parse(fileIds) : [];
-    if (!Array.isArray(ids) || ids.length === 0) {
-        const { results: rows = [] } = await c.env.DB.prepare(
-            "SELECT id FROM Context WHERE file_name = ?"
-        ).bind(fileName).all();
-        ids = (rows as Array<{ id: number }>).map((row) => row.id.toString());
-        if (ids.length === 0) return new Response("File not found", { status: 404 });
-    }
-    if (Array.isArray(ids) && ids.length > 0) {
-        const placeholder = ids.map(() => "?").join(",");
-        await c.env.DB.prepare(`DELETE FROM Context WHERE id IN (${placeholder})`).bind(...ids).run();
-        await c.env.VECTORIZE.deleteByIds(ids.map((id: number) => id.toString()));
-    }
-    await c.env.KV.delete(fileName);
-    return new Response(JSON.stringify({ message: "File deleted" }), { status: 200 });
+    const result = await deleteContextFile(c.env, fileName);
+    return new Response(JSON.stringify({ message: result.message }), { status: result.status });
 });
 
 export default context;
