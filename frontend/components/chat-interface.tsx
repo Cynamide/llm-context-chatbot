@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Send, Loader2, Bot, User } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { MarkdownMessage } from "@/components/markdown-message"
 import {
   appendAssistantPlaceholder,
   appendAssistantText,
@@ -188,7 +189,7 @@ export function ChatInterface() {
                     </div>
                   ) : (
                     <>
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <MarkdownMessage content={message.content} />
                       {message.role === "assistant" && message.metrics ? (
                         <div className="mt-2 flex flex-wrap gap-2 border-t border-border/60 pt-2 text-[11px] leading-none text-muted-foreground/80">
                           {message.metrics.ttftMs != null ? (
